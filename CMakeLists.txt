@@ -9,6 +9,7 @@ find_package(pybind11 CONFIG REQUIRED)
 pybind11_add_module(_core
     src/flxscalers/bindings.cpp
     src/flxscalers/scalers/min_max_scaler.cpp
+    src/flxscalers/core/matrix.cpp
 )
 
 # So headers can be included as "flxscalers/scalers/min_max_scaler.hpp".

@@ -1,13 +1,14 @@
-#include "matrix.hpp"
-#include <iostream>
 #include <string>
 
-Matrix::Matrix(std::size_t rows, std::size_t cols) {
-    std::vector<double> data(rows*cols, 0.0);
-}
+#include "matrix.hpp"
 
-Matrix::Matrix(std::size_t rows, std::size_t cols, std::vector<double> data) {
-}
+Matrix::Matrix(std::size_t rows, std::size_t cols)
+    : data(rows * cols, 0.0), rows(rows), cols(cols) {}
+
+
+Matrix::Matrix(std::size_t rows, std::size_t cols, std::vector<double> data)
+    : data(std::move(data)), rows(rows), cols(cols) {}
+
 
 double& Matrix::at(std::size_t i, std::size_t j) {
     return data[i * cols + j];
