@@ -13,6 +13,7 @@ FetchContent_MakeAvailable(Catch2)
 # tests/cpp/<area>/test_<file>.cpp entry here as the suite grows.
 add_executable(flxscalers_cpp_tests
     core/test_matrix.cpp
+    scalers/test_min_max_scaler.cpp
 )
 target_link_libraries(flxscalers_cpp_tests
     PRIVATE
