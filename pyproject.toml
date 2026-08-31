@@ -12,6 +12,7 @@ dependencies = ["numpy>=1.21"]
 
 [project.optional-dependencies]
 test = ["pytest>=8"]
+bench = ["scikit-learn", "matplotlib", "pandas"]
 
 [tool.scikit-build]
 # Fail loudly if an older scikit-build-core than we pinned tries to build us.
