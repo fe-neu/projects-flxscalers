@@ -9,6 +9,9 @@ description = "A small package that offers an C++ based API for scaling data wit
 readme = "README.md"
 requires-python = ">=3.9"
 
+[project.optional-dependencies]
+test = ["pytest>=8"]
+
 [tool.scikit-build]
 # Fail loudly if an older scikit-build-core than we pinned tries to build us.
 minimum-version = "build-system.requires"
@@ -25,3 +28,6 @@ wheel.packages = ["python/flxscalers"]
 
 # `pip install -e .` recompiles automatically when a C++/CMake file changes.
 editable.rebuild = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests/python"]
