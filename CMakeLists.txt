@@ -25,8 +25,12 @@ if(FLXSCALERS_BUILD_PYTHON)
     find_package(pybind11 CONFIG REQUIRED)
 
     # The compiled module. Only the binding glue lives here; everything it
-    # wraps comes from flxscalers_core.
-    pybind11_add_module(_core src/flxscalers/bindings.cpp)
+    # wraps comes from flxscalers_core. Add each new binding .cpp below.
+    pybind11_add_module(_core
+        src/flxscalers/bindings/_core.cpp
+        src/flxscalers/bindings/conversions.cpp
+        src/flxscalers/bindings/scalers/min_max_scaler.cpp
+    )
     target_link_libraries(_core PRIVATE flxscalers_core)
 
     # Install into the `flxscalers` package -> importable as `flxscalers._core`.
