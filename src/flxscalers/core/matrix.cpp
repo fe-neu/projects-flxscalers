@@ -1,4 +1,5 @@
 #include <string>
+#include <stdexcept>
 
 #include "matrix.hpp"
 
@@ -11,10 +12,22 @@ Matrix::Matrix(std::size_t rows, std::size_t cols, std::vector<double> data)
 
 
 double& Matrix::at(std::size_t i, std::size_t j) {
+    if (i >= rows)
+        throw std::out_of_range("row index " + std::to_string(i) +
+                                " is out of bounds for row count " + std::to_string(rows));
+    if (j >= cols)
+        throw std::out_of_range("column index " + std::to_string(j) +
+                                " is out of bounds for column count " + std::to_string(cols));
     return data[i * cols + j];
 }
 
 double Matrix::at(std::size_t i, std::size_t j) const{
+    if (i >= rows)
+        throw std::out_of_range("row index " + std::to_string(i) +
+                                " is out of bounds for row count " + std::to_string(rows));
+    if (j >= cols)
+        throw std::out_of_range("column index " + std::to_string(j) +
+                                " is out of bounds for column count " + std::to_string(cols));
     return data[i * cols + j];
 }
 
