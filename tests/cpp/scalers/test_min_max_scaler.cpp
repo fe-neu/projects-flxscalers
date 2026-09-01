@@ -104,15 +104,11 @@ TEST_CASE("fit_transform() preserves the input shape", "[minmax]") {
     CHECK(out.cols == 3);
 }
 
-// Characterisation test, not a spec: a column with zero spread divides by
-// (max - min) == 0. scikit-learn special-cases this to leave the column at the
-// range low; this implementation currently produces NaN. Captured here so the
-// behaviour change is visible when that gap is closed.
-TEST_CASE("a constant column currently yields NaN", "[minmax][known-gap]") {
+TEST_CASE("transform() on a constant column yields lower bound of feature range", "[minmax]") {
     MinMaxScaler scaler({0.0, 1.0});
     Matrix X(3, 1, {7.0, 7.0, 7.0});
 
     Matrix out = scaler.fit_transform(X);
 
-    CHECK(std::isnan(out.at(0, 0)));
+    CHECK(out.at(0, 0) == 0.0);
 }

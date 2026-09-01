@@ -38,12 +38,27 @@ Matrix MinMaxScaler::transform(const Matrix& X) const {
 
     Matrix result = Matrix(X.rows, X.cols);
 
+    const double lower_limit = feature_range.first;
+    const double feature_span = feature_range.second - lower_limit;
+
     for(std::size_t n_col = 0; n_col < X.cols; n_col++){
+
+        const double minimum = minimums[n_col];
+        const double span = maximums[n_col] - minimum;
+
+        // Checking for Constant Columns and set all to the lower limit of the feature range
+        if (span == 0.0) {
+            for(std::size_t n_row = 0; n_row < X.rows; n_row++){
+                result.at(n_row, n_col) = lower_limit;
+            }
+            continue; 
+        }
+
         for(std::size_t n_row = 0; n_row < X.rows; n_row++){
             result.at(n_row, n_col) = (
-                (X.at(n_row, n_col) - minimums[n_col])
-                / (maximums[n_col] - minimums[n_col])
-            ) * (feature_range.second - feature_range.first) + feature_range.first;
+                (X.at(n_row, n_col) - minimum)
+                / span
+            ) * feature_span + lower_limit;
         } 
     }
 
@@ -61,12 +76,18 @@ Matrix MinMaxScaler::inverse_transform(const Matrix& X) const {
 
     Matrix result = Matrix(X.rows, X.cols);
 
+    const double lower_limit = feature_range.first;
+    const double feature_span = feature_range.second - lower_limit;
+
     for(std::size_t n_col = 0; n_col < X.cols; n_col++){
+
+        const double minimum = minimums[n_col];
+        const double span = maximums[n_col] - minimum;
         for(std::size_t n_row = 0; n_row < X.rows; n_row++){
             result.at(n_row, n_col) = (
-                (X.at(n_row, n_col) - feature_range.first)
-                / (feature_range.second - feature_range.first)
-            ) * (maximums[n_col] - minimums[n_col]) + minimums[n_col];
+                (X.at(n_row, n_col) - lower_limit)
+                / feature_span
+            ) * span + minimum;
         } 
     }
 
