@@ -2,17 +2,18 @@ import numpy as np
 import pytest
 
 from flxscalers import MinMaxScaler
+from flxscalers import NotFittedError
 
 
 def test_transform_before_fit_raises():
     scaler = MinMaxScaler((0.0, 1.0))
-    with pytest.raises(RuntimeError):
+    with pytest.raises(NotFittedError):
         scaler.transform(np.array([[1.0], [2.0]]))
 
 
 def test_inverse_transform_before_fit_raises():
     scaler = MinMaxScaler((0.0, 1.0))
-    with pytest.raises(RuntimeError):
+    with pytest.raises(NotFittedError):
         scaler.inverse_transform(np.array([[1.0], [2.0]]))
 
 

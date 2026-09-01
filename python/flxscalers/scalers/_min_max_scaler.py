@@ -4,6 +4,7 @@ import numpy as np
 import numpy.typing as npt
 
 from flxscalers import _core
+from flxscalers.exceptions import NotFittedError
 
 
 class MinMaxScaler:
@@ -69,7 +70,10 @@ class MinMaxScaler:
         ndarray of shape (n_samples, n_features)
             The scaled data, as ``float64``.
         """
-        return self._impl.transform(self._validate(X))
+        try:
+            return self._impl.transform(self._validate(X))
+        except RuntimeError as e:
+            raise NotFittedError(self) from e
 
     def fit_transform(self, X: npt.ArrayLike) -> npt.NDArray[np.float64]:
         """Fit to ``X``, then scale it. Equivalent to ``fit(X).transform(X)``."""
@@ -88,7 +92,10 @@ class MinMaxScaler:
         ndarray of shape (n_samples, n_features)
             The data in the original space, as ``float64``.
         """
-        return self._impl.inverse_transform(self._validate(X))
+        try:
+            return self._impl.inverse_transform(self._validate(X))
+        except RuntimeError as e:
+            raise NotFittedError(self) from e
 
     def __repr__(self) -> str:
         return f"{type(self).__name__}(feature_range={self.feature_range})"
