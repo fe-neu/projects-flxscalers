@@ -1,40 +1,86 @@
 # flxscalers
 
-A small package that offers a C++-based API for scaling data with scalers such
-as `StandardScaler` or `MinMaxScaler`. The numeric core is a compiled C++17
-extension (`flxscalers._core`); a thin pure-Python layer is the public API.
+Data scalers with a compiled C++17 core and a thin, typed Python API. The
+numeric work happens in an extension module (`flxscalers._core`); the public
+Python layer only validates input and wraps the result.
 
-## Layout
+## Features
 
-```
-src/flxscalers/
-  core/             internal C++ core (Matrix); built as the static lib flxscalers_core
-  scalers/          C++ scaler implementations (min_max_scaler.{hpp,cpp})
-  bindings/         pybind11 layer -> the flxscalers._core extension
-    _core.cpp         the single PYBIND11_MODULE
-    register.hpp      register_*() declarations, one per scaler
-    conversions.*     NumPy <-> Matrix marshalling (Matrix is never exposed to Python)
-    scalers/          one binding .cpp per scaler
-python/flxscalers/  pure-Python public API (wraps flxscalers._core)
-  scalers/            _min_max_scaler.py, ...
-  _core.pyi           type stub for the compiled module
-  py.typed            PEP 561 marker
-tests/cpp/          Catch2 tests; layout mirrors src/flxscalers/<area>/
-tests/python/       pytest tests
-CMakeLists.txt      builds flxscalers_core + the _core extension (+ C++ tests, opt-in)
-CMakePresets.json   the "dev" preset for the C++ test build
-pyproject.toml      scikit-build-core backend + project metadata
-```
+- **`MinMaxScaler`** — linearly rescales every feature from its observed
+  `[min, max]` span onto a configurable `feature_range` (default `(0.0, 1.0)`).
+  Values outside the fitted span map outside the range rather than being
+  clipped.
+- **Familiar estimator API** — `fit`, `transform`, `fit_transform`, and
+  `inverse_transform`, matching the scikit-learn method names and semantics.
+- **Compiled core** — the per-feature statistics and the scaling pass run in
+  C++17, not Python.
+- **NumPy in, NumPy out** — accepts any array-like of shape
+  `(n_samples, n_features)`; always returns a `float64` `ndarray`.
+- **Typed** — ships `py.typed` and stubs, so `MinMaxScaler` is fully checkable
+  under mypy/pyright.
+- **Clear errors** — calling `transform` before `fit` raises
+  `flxscalers.NotFittedError` with an actionable message.
 
-## Install (consumers)
+More scalers (e.g. `StandardScaler`) are planned.
+
+## Install
 
 ```bash
 pip install .
 ```
 
 NumPy is pulled in as a runtime dependency. No system CMake, Ninja, or compiler
-toolchain setup is required beyond a C++17 compiler — scikit-build-core fetches
-CMake and Ninja into an isolated build environment automatically.
+setup is required beyond a C++17 compiler — scikit-build-core fetches CMake and
+Ninja into an isolated build environment automatically.
+
+## Usage
+
+```python
+import numpy as np
+from flxscalers import MinMaxScaler
+
+X = np.array([[0.0, 10.0],
+              [5.0, 20.0],
+              [10.0, 30.0]])
+
+scaler = MinMaxScaler()
+X_scaled = scaler.fit_transform(X)
+# array([[0. , 0. ],
+#        [0.5, 0.5],
+#        [1. , 1. ]])
+
+# Reuse the fitted range on new data; values beyond the fitted span
+# extrapolate past feature_range instead of being clipped.
+scaler.transform(np.array([[15.0, 40.0]]))
+# array([[1.5, 1.5]])
+
+# Round-trip back to the original units.
+scaler.inverse_transform(X_scaled)
+# array([[ 0., 10.],
+#        [ 5., 20.],
+#        [10., 30.]])
+```
+
+Scale onto a custom range by passing `feature_range`:
+
+```python
+scaler = MinMaxScaler(feature_range=(-1.0, 1.0))
+scaler.fit_transform(X)
+# array([[-1., -1.],
+#        [ 0.,  0.],
+#        [ 1.,  1.]])
+```
+
+Using a method that needs fitted state before calling `fit` raises:
+
+```python
+from flxscalers import MinMaxScaler, NotFittedError
+
+try:
+    MinMaxScaler().transform(X)
+except NotFittedError as e:
+    print(e)  # MinMaxScaler is not fitted yet. Call fit() first.
+```
 
 ## Development
 
