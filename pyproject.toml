@@ -1,0 +1,35 @@
+[build-system]
+requires = ["scikit-build-core>=0.10", "pybind11>=2.12"]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "flxscalers"
+version = "0.0.1"
+description = "A small package that offers an C++ based API for scaling data with scalers such as StandardScaler or MinMaxScaler."
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = ["numpy>=1.21"]
+
+[project.optional-dependencies]
+test = ["pytest>=8"]
+bench = ["scikit-learn", "matplotlib", "pandas"]
+
+[tool.scikit-build]
+# Fail loudly if an older scikit-build-core than we pinned tries to build us.
+minimum-version = "build-system.requires"
+
+# Out-of-source build tree, one per Python/platform tag so switching
+# interpreters does not force a full reconfigure.
+build-dir = "build/{wheel_tag}"
+
+# The pure-Python package does not sit at the repo root or in ./src, so point
+# scikit-build-core at it explicitly. It is installed as top-level `flxscalers`;
+# CMake's `install(TARGETS _core DESTINATION flxscalers)` drops the compiled
+# extension into the same package, giving `flxscalers._core`.
+wheel.packages = ["python/flxscalers"]
+
+# `pip install -e .` recompiles automatically when a C++/CMake file changes.
+editable.rebuild = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests/python"]
