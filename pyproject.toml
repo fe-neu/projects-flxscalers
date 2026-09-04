@@ -4,15 +4,55 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "flxscalers"
-version = "0.0.1"
+version = "0.1.0"
 description = "A small package that offers an C++ based API for scaling data with scalers such as StandardScaler or MinMaxScaler."
 readme = "README.md"
 requires-python = ">=3.9"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [
+    { name = "Felix Neu", email = "felix.neu.ide@web.de" },
+]
+keywords = [
+    "scaler",
+    "scaling",
+    "preprocessing",
+    "normalization",
+    "standardization",
+    "machine-learning",
+    "numpy",
+    "c++",
+    "pybind11",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: MacOS",
+    "Operating System :: Microsoft :: Windows",
+    "Programming Language :: C++",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Scientific/Engineering",
+    "Typing :: Typed",
+]
 dependencies = ["numpy>=1.21"]
 
 [project.optional-dependencies]
 test = ["pytest>=8"]
 bench = ["scikit-learn", "matplotlib", "pandas"]
+
+[project.urls]
+Homepage = "https://github.com/fe-neu/projects-flxscalers"
+Repository = "https://github.com/fe-neu/projects-flxscalers"
+Issues = "https://github.com/fe-neu/projects-flxscalers/issues"
+Changelog = "https://github.com/fe-neu/projects-flxscalers/blob/main/CHANGELOG.md"
 
 [tool.scikit-build]
 # Fail loudly if an older scikit-build-core than we pinned tries to build us.
@@ -30,6 +70,45 @@ wheel.packages = ["python/flxscalers"]
 
 # `pip install -e .` recompiles automatically when a C++/CMake file changes.
 editable.rebuild = true
+
+[tool.scikit-build.sdist]
+# scikit-build-core seeds the SDist from the git-tracked file list. That already
+# carries everything needed to compile from source (src/ C++ and headers,
+# CMakeLists.txt, CMakePresets.json, the python/ package) and nothing from the
+# untracked build/, venv/, or build-test/ trees. Drop what has no role once the
+# project is a tarball: repo-management files, and the test suites (the wheel
+# build never enables the C++ tests, and running the Python tests is a
+# clone-the-repo workflow, not an sdist one).
+exclude = [
+    ".github/",
+    ".gitignore",
+    "tests/",
+]
+
+[tool.cibuildwheel]
+# Minimal target set for the first release: CPython 3.9-3.13 on the three
+# mainstream desktop/server platforms (Linux x86_64, macOS, Windows AMD64).
+# No PyPy, no musllinux, no Linux aarch64 yet - each can be added later
+# without a breaking change. Architectures come from `archs = "auto"` (the
+# default), so the 64-bit CI runners never attempt 32-bit builds.
+build = "cp39-* cp310-* cp311-* cp312-* cp313-*"
+skip = "*-musllinux*"
+build-frontend = "build"
+
+# Exercise every built wheel against the Python suite. tests/ is kept out of
+# the sdist but is present in the CI checkout, so {project} resolves to it.
+test-requires = "pytest>=8"
+test-command = "python -m pytest {project}/tests/python"
+
+[tool.cibuildwheel.linux]
+# manylinux_2_28 ships GCC 12, comfortably past the C++17 core's needs (the
+# default manylinux2014 / GCC 10 would also build it).
+manylinux-x86_64-image = "manylinux_2_28"
+
+[tool.cibuildwheel.windows]
+# `archs = "auto"` on a 64-bit Windows runner would also cross-build 32-bit
+# (win32) wheels; the minimal set is 64-bit only.
+archs = ["AMD64"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests/python"]
