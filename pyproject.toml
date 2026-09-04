@@ -71,5 +71,16 @@ wheel.packages = ["python/flxscalers"]
 # `pip install -e .` recompiles automatically when a C++/CMake file changes.
 editable.rebuild = true
 
+[tool.scikit-build.sdist]
+# scikit-build-core seeds the SDist from the git-tracked file list. That already
+# carries everything needed to compile from source (src/ C++ and headers,
+# CMakeLists.txt, CMakePresets.json, the python/ package) and nothing from the
+# untracked build/, venv/, or build-test/ trees. Only drop repo-management files
+# that have no role once the project is a tarball.
+exclude = [
+    ".github/",
+    ".gitignore",
+]
+
 [tool.pytest.ini_options]
 testpaths = ["tests/python"]
