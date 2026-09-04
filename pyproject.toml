@@ -85,5 +85,30 @@ exclude = [
     "tests/",
 ]
 
+[tool.cibuildwheel]
+# Minimal target set for the first release: CPython 3.9-3.13 on the three
+# mainstream desktop/server platforms (Linux x86_64, macOS, Windows AMD64).
+# No PyPy, no musllinux, no Linux aarch64 yet - each can be added later
+# without a breaking change. Architectures come from `archs = "auto"` (the
+# default), so the 64-bit CI runners never attempt 32-bit builds.
+build = "cp39-* cp310-* cp311-* cp312-* cp313-*"
+skip = "*-musllinux*"
+build-frontend = "build"
+
+# Exercise every built wheel against the Python suite. tests/ is kept out of
+# the sdist but is present in the CI checkout, so {project} resolves to it.
+test-requires = "pytest>=8"
+test-command = "python -m pytest {project}/tests/python"
+
+[tool.cibuildwheel.linux]
+# manylinux_2_28 ships GCC 12, comfortably past the C++17 core's needs (the
+# default manylinux2014 / GCC 10 would also build it).
+manylinux-x86_64-image = "manylinux_2_28"
+
+[tool.cibuildwheel.windows]
+# `archs = "auto"` on a 64-bit Windows runner would also cross-build 32-bit
+# (win32) wheels; the minimal set is 64-bit only.
+archs = ["AMD64"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests/python"]
