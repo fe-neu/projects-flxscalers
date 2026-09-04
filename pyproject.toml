@@ -4,15 +4,54 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "flxscalers"
-version = "0.0.1"
+version = "0.1.0"
 description = "A small package that offers an C++ based API for scaling data with scalers such as StandardScaler or MinMaxScaler."
 readme = "README.md"
 requires-python = ">=3.9"
+authors = [
+    { name = "Felix Neu", email = "felix.neu.ide@web.de" },
+]
+keywords = [
+    "scaler",
+    "scaling",
+    "preprocessing",
+    "normalization",
+    "standardization",
+    "machine-learning",
+    "numpy",
+    "c++",
+    "pybind11",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: MacOS",
+    "Operating System :: Microsoft :: Windows",
+    "Programming Language :: C++",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Scientific/Engineering",
+    "Typing :: Typed",
+]
 dependencies = ["numpy>=1.21"]
 
 [project.optional-dependencies]
 test = ["pytest>=8"]
 bench = ["scikit-learn", "matplotlib", "pandas"]
+
+[project.urls]
+Homepage = "https://github.com/fe-neu/projects-flxscalers"
+Repository = "https://github.com/fe-neu/projects-flxscalers"
+Issues = "https://github.com/fe-neu/projects-flxscalers/issues"
+Changelog = "https://github.com/fe-neu/projects-flxscalers/blob/main/CHANGELOG.md"
 
 [tool.scikit-build]
 # Fail loudly if an older scikit-build-core than we pinned tries to build us.
