@@ -75,11 +75,14 @@ editable.rebuild = true
 # scikit-build-core seeds the SDist from the git-tracked file list. That already
 # carries everything needed to compile from source (src/ C++ and headers,
 # CMakeLists.txt, CMakePresets.json, the python/ package) and nothing from the
-# untracked build/, venv/, or build-test/ trees. Only drop repo-management files
-# that have no role once the project is a tarball.
+# untracked build/, venv/, or build-test/ trees. Drop what has no role once the
+# project is a tarball: repo-management files, and the test suites (the wheel
+# build never enables the C++ tests, and running the Python tests is a
+# clone-the-repo workflow, not an sdist one).
 exclude = [
     ".github/",
     ".gitignore",
+    "tests/",
 ]
 
 [tool.pytest.ini_options]
