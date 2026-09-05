@@ -1,5 +1,7 @@
 # flxscalers
 
+[![PyPI](https://img.shields.io/pypi/v/flxscalers)](https://pypi.org/project/flxscalers/)
+
 Data scalers with a compiled C++17 core and a thin, typed Python API. The
 numeric work happens in an extension module (`flxscalers._core`); the public
 Python layer only validates input and wraps the result.
