@@ -110,5 +110,15 @@ manylinux-x86_64-image = "manylinux_2_28"
 # (win32) wheels; the minimal set is 64-bit only.
 archs = ["AMD64"]
 
+[tool.cibuildwheel.macos]
+# Build both macOS wheels from the single Apple-silicon runner instead of
+# needing a separate Intel (macos-13) one: Xcode's clang cross-compiles
+# x86_64 from an arm64 host, and GitHub's arm64 macOS runners ship Rosetta 2,
+# so cibuildwheel can still run the test suite against the x86_64 wheel it
+# just built. (macos-13 hosted runners have effectively no free-tier
+# capacity left as GitHub retires the Intel macOS fleet - jobs queue
+# indefinitely rather than failing outright.)
+archs = ["x86_64", "arm64"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests/python"]
