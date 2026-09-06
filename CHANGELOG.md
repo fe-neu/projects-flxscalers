@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `StandardScaler`: per-feature standardization to zero mean and unit
+  variance, using the population standard deviation. `with_mean` and
+  `with_std` toggle centering and scaling independently; zero-variance
+  features are left unscaled instead of dividing by zero. Provides `fit`,
+  `transform`, `fit_transform`, and `inverse_transform`.
+
 ## [0.1.0] - 2026-09-05
 
 ### Added

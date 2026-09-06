@@ -65,13 +65,13 @@ Matrix MinMaxScaler::transform(const Matrix& X) const {
     return result;
 }
 
-Matrix MinMaxScaler::fit_transform(const Matrix& X)
-{
+Matrix MinMaxScaler::fit_transform(const Matrix& X) {
     fit(X);
     return transform(X);
 }
 
 Matrix MinMaxScaler::inverse_transform(const Matrix& X) const {
+
     if (!is_fitted) throw std::logic_error("call fit() first");
 
     Matrix result = Matrix(X.rows, X.cols);

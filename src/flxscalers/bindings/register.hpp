@@ -7,5 +7,6 @@
 #include <pybind11/pybind11.h>
 
 void register_min_max_scaler(pybind11::module_& m);
+void register_standard_scaler(pybind11::module_& m);
 
 #endif
