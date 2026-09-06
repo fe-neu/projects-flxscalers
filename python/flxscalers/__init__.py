@@ -9,7 +9,11 @@ from flxscalers.scalers import (
 from importlib.metadata import PackageNotFoundError, version
 
 
-__all__ = ["MinMaxScaler", "NotFittedError"]
+__all__ = [
+    "MinMaxScaler",
+    "StandardScaler",
+    "NotFittedError",
+    ]
 
 try:
     __version__ = version("flxscalers")
