@@ -9,7 +9,8 @@ project(flxscalers LANGUAGES CXX)
 add_library(flxscalers_core STATIC
     src/flxscalers/core/matrix.cpp
     src/flxscalers/scalers/min_max_scaler.cpp
-)
+    src/flxscalers/scalers/standard_scaler.cpp
+    )
 target_include_directories(flxscalers_core PUBLIC src)
 target_compile_features(flxscalers_core PUBLIC cxx_std_17)
 set_target_properties(flxscalers_core PROPERTIES POSITION_INDEPENDENT_CODE ON)
@@ -30,6 +31,7 @@ if(FLXSCALERS_BUILD_PYTHON)
         src/flxscalers/bindings/_core.cpp
         src/flxscalers/bindings/conversions.cpp
         src/flxscalers/bindings/scalers/min_max_scaler.cpp
+        src/flxscalers/bindings/scalers/standard_scaler.cpp
     )
     target_link_libraries(_core PRIVATE flxscalers_core)
 
