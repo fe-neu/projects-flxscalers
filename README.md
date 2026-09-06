@@ -12,6 +12,10 @@ Python layer only validates input and wraps the result.
   `[min, max]` span onto a configurable `feature_range` (default `(0.0, 1.0)`).
   Values outside the fitted span map outside the range rather than being
   clipped.
+- **`StandardScaler`** — centers every feature to zero mean and scales it to
+  unit variance (population standard deviation). `with_mean` and `with_std`
+  toggle the two steps independently; zero-variance features are left
+  unscaled rather than dividing by zero.
 - **Familiar estimator API** — `fit`, `transform`, `fit_transform`, and
   `inverse_transform`, matching the scikit-learn method names and semantics.
 - **Compiled core** — the per-feature statistics and the scaling pass run in
@@ -22,8 +26,6 @@ Python layer only validates input and wraps the result.
   under mypy/pyright.
 - **Clear errors** — calling `transform` before `fit` raises
   `flxscalers.NotFittedError` with an actionable message.
-
-More scalers (e.g. `StandardScaler`) are planned.
 
 ## Install
 
@@ -71,6 +73,24 @@ scaler.fit_transform(X)
 # array([[-1., -1.],
 #        [ 0.,  0.],
 #        [ 1.,  1.]])
+```
+
+`StandardScaler` centers each feature to zero mean and unit variance:
+
+```python
+from flxscalers import StandardScaler
+
+StandardScaler().fit_transform(X)
+# array([[-1.22474487, -1.22474487],
+#        [ 0.        ,  0.        ],
+#        [ 1.22474487,  1.22474487]])
+
+# Turn off either step; a constant feature is left unscaled rather than
+# producing NaN/inf.
+StandardScaler(with_std=False).fit_transform(X)
+# array([[-5., -10.],
+#        [ 0.,   0.],
+#        [ 5.,  10.]])
 ```
 
 Using a method that needs fitted state before calling `fit` raises:
