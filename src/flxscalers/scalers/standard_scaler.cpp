@@ -64,7 +64,7 @@ Matrix StandardScaler::transform(const Matrix& X) const {
         }
 
         double standard_deviation = 1.0;
-        if (with_std) {
+        if (with_std && stds[n_col] != 0.0) {
             standard_deviation = stds[n_col];
         }
 
@@ -98,7 +98,7 @@ Matrix StandardScaler::inverse_transform(const Matrix& X) const {
         }
 
         double standard_deviation = 1.0;
-        if (with_std) {
+        if (with_std && stds[n_col] != 0.0) {
             standard_deviation = stds[n_col];
         }
 
