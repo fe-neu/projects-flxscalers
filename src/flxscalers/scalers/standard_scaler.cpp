@@ -1,6 +1,4 @@
-#include <string>
 #include <stdexcept>
-#include <utility>
 #include <cmath>
 
 #include "standard_scaler.hpp"
@@ -9,7 +7,11 @@ StandardScaler::StandardScaler(bool with_mean, bool with_std)
     : with_mean(with_mean), with_std(with_std), is_fitted(false) {}
 
 void StandardScaler::fit(const Matrix& X){
-    if (!with_mean && !with_std) { return; } // Nothing to compute since transforming will simply use mean = 0 and std = 1
+    // Nothing to compute since transforming will simply use mean = 0 and std = 1
+    if (!with_mean && !with_std) {
+        this->is_fitted = true;
+        return;
+    }
 
     means.assign(X.cols, 0.0);
 
@@ -18,7 +20,7 @@ void StandardScaler::fit(const Matrix& X){
     for(std::size_t n_col = 0; n_col < X.cols; n_col++){
 
         double mean = compute_mean_for_col(X, n_col);
-        means[n_col] = mean;
+        if (with_mean) { means[n_col] = mean; }
 
         if (with_std) {
             double std = compute_std_for_col(X, n_col, mean);
