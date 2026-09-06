@@ -20,6 +20,10 @@ class StandardScaler:
     scaling is skipped when ``with_std`` is false; if both are false the
     data passes through unchanged.
 
+    A feature with zero variance carries no information to scale, so its
+    standard deviation is treated as ``1``: the column is centered (when
+    ``with_mean`` is true) but never divided by zero.
+
     Parameters
     ----------
     with_mean : bool, default=True
