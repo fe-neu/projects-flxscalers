@@ -5,6 +5,7 @@ import numpy.typing as npt
 
 from flxscalers import _core
 from flxscalers.exceptions import NotFittedError
+from flxscalers.scalers._validation import check_array, check_n_features
 
 
 class MinMaxScaler:
@@ -55,7 +56,9 @@ class MinMaxScaler:
         self : MinMaxScaler
             The fitted scaler.
         """
-        self._impl.fit(self._validate(X))
+        X = check_array(X)
+        self._impl.fit(X)
+        self.n_features_in_ = X.shape[1]
         return self
 
     def transform(self, X: npt.ArrayLike) -> npt.NDArray[np.float64]:
@@ -70,14 +73,20 @@ class MinMaxScaler:
         ndarray of shape (n_samples, n_features)
             The scaled data, as ``float64``.
         """
+        X = check_array(X)
+        if hasattr(self, "n_features_in_"):
+            check_n_features(X, self.n_features_in_)
         try:
-            return self._impl.transform(self._validate(X))
+            return self._impl.transform(X)
         except _core.NotFittedError as e:
             raise NotFittedError(self) from e
 
     def fit_transform(self, X: npt.ArrayLike) -> npt.NDArray[np.float64]:
         """Fit to ``X``, then scale it. Equivalent to ``fit(X).transform(X)``."""
-        return self._impl.fit_transform(self._validate(X))
+        X = check_array(X)
+        out = self._impl.fit_transform(X)
+        self.n_features_in_ = X.shape[1]
+        return out
 
     def inverse_transform(self, X: npt.ArrayLike) -> npt.NDArray[np.float64]:
         """Map data from ``feature_range`` back to the original feature range.
@@ -92,19 +101,13 @@ class MinMaxScaler:
         ndarray of shape (n_samples, n_features)
             The data in the original space, as ``float64``.
         """
+        X = check_array(X)
+        if hasattr(self, "n_features_in_"):
+            check_n_features(X, self.n_features_in_)
         try:
-            return self._impl.inverse_transform(self._validate(X))
+            return self._impl.inverse_transform(X)
         except _core.NotFittedError as e:
             raise NotFittedError(self) from e
 
     def __repr__(self) -> str:
         return f"{type(self).__name__}(feature_range={self.feature_range})"
-
-    @staticmethod
-    def _validate(X: npt.ArrayLike) -> npt.NDArray[np.float64]:
-        """Coerce ``X`` to a 2-D ``float64`` array, raising on wrong ndim."""
-        # TODO: 1-D handling, non-finite checks, feature-count check on transform.
-        array = np.asarray(X, dtype=np.float64)
-        if array.ndim != 2:
-            raise ValueError(f"expected a 2-D array, got {array.ndim}-D")
-        return array
