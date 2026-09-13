@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-09-13
+
 ### Added
 
 - `StandardScaler`: per-feature standardization to zero mean and unit
@@ -48,3 +50,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [Unreleased]: https://github.com/fe-neu/projects-flxscalers/compare/v0.1.0...HEAD
 [0.1.0]: https://github.com/fe-neu/projects-flxscalers/releases/tag/v0.1.0
+[0.2.0]: https://github.com/fe-neu/projects-flxscalers/releases/tag/v0.2.0
