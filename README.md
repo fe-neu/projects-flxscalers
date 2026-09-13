@@ -25,7 +25,10 @@ Python layer only validates input and wraps the result.
 - **Typed** — ships `py.typed` and stubs, so `MinMaxScaler` is fully checkable
   under mypy/pyright.
 - **Clear errors** — calling `transform` before `fit` raises
-  `flxscalers.NotFittedError` with an actionable message.
+  `flxscalers.NotFittedError` with an actionable message; a 1-D array, a
+  non-finite value, or a feature-count mismatch between `fit` and
+  `transform`/`inverse_transform` raises a `ValueError` with a specific
+  message.
 
 ## Install
 
@@ -173,8 +176,13 @@ pytest
    `bindings/register.hpp`, call it from `bindings/_core.cpp`, and add the
    `.cpp` to `pybind11_add_module(_core ...)`.
 3. **Python** — `python/flxscalers/scalers/_<name>.py` wrapping
-   `flxscalers._core.<Name>` by composition; re-export it from
-   `scalers/__init__.py` and the top-level `__init__.py`, and add the class to
+   `flxscalers._core.<Name>` by composition. Validate input with
+   `flxscalers.scalers._validation.check_array` in `fit`, `transform`,
+   `fit_transform`, and `inverse_transform`; have `fit`/`fit_transform` set
+   `self.n_features_in_ = X.shape[1]`, and have `transform`/
+   `inverse_transform` call `check_n_features(X, self.n_features_in_)` when
+   that attribute is already set. Re-export the class from
+   `scalers/__init__.py` and the top-level `__init__.py`, and add it to
    `_core.pyi`.
 4. **Tests** — `tests/cpp/scalers/test_<name>.cpp` (add it to
    `tests/cpp/CMakeLists.txt`) and `tests/python/scalers/test_<name>.py`.

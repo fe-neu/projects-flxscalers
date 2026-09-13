@@ -14,6 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `with_std` toggle centering and scaling independently; zero-variance
   features are left unscaled instead of dividing by zero. Provides `fit`,
   `transform`, `fit_transform`, and `inverse_transform`.
+- `n_features_in_` attribute on `MinMaxScaler` and `StandardScaler`, set by
+  `fit`/`fit_transform`. `transform` and `inverse_transform` now raise
+  `ValueError` if called with a different number of features.
+- Scalers now reject non-finite (NaN/Inf) input with a clear `ValueError`.
 
 ### Changed
 
@@ -22,6 +26,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   translator, instead of a generic `std::runtime_error` that crossed into
   Python as a plain `RuntimeError`. The public `flxscalers.NotFittedError`
   and its message are unchanged.
+- Per-scaler input validation, previously duplicated in each scaler class,
+  is now centralized in `flxscalers.scalers._validation`
+  (`check_array`, `check_n_features`). The 1-D rejection error now includes
+  a reshape hint. Fitted-state checks remain in the C++ core.
 
 ## [0.1.0] - 2026-09-05
 
