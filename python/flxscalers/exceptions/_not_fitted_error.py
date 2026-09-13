@@ -1,5 +1,3 @@
-"""Exceptions and Errors used throughout flxscalers"""
-
 class NotFittedError(RuntimeError):
     """Raised when a scaler method needing fitted state is called before fit()."""
 

@@ -8,5 +8,6 @@
 
 void register_min_max_scaler(pybind11::module_& m);
 void register_standard_scaler(pybind11::module_& m);
+void register_not_fitted_error(pybind11::module_& m);
 
 #endif

@@ -4,6 +4,8 @@
 
 #include "min_max_scaler.hpp"
 
+#include "flxscalers/exceptions/not_fitted_error.hpp"
+
 MinMaxScaler::MinMaxScaler(std::pair<double, double> feature_range)
     : feature_range(feature_range), is_fitted(false) {}
 
@@ -34,7 +36,7 @@ void MinMaxScaler::fit(const Matrix& X){
 
 Matrix MinMaxScaler::transform(const Matrix& X) const {
 
-    if (!is_fitted) throw std::logic_error("call fit() first");
+    if (!is_fitted) throw NotFittedError("call fit() first");
 
     Matrix result = Matrix(X.rows, X.cols);
 
@@ -72,7 +74,7 @@ Matrix MinMaxScaler::fit_transform(const Matrix& X) {
 
 Matrix MinMaxScaler::inverse_transform(const Matrix& X) const {
 
-    if (!is_fitted) throw std::logic_error("call fit() first");
+    if (!is_fitted) throw NotFittedError("call fit() first");
 
     Matrix result = Matrix(X.rows, X.cols);
 
