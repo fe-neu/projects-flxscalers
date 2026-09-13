@@ -8,52 +8,59 @@ from flxscalers.exceptions import NotFittedError
 from flxscalers.scalers._validation import check_array, check_n_features
 
 
-class MinMaxScaler:
-    """Scale each feature onto a given range.
+class StandardScaler:
+    """Standardize each feature by centering and scaling to unit variance.
 
-    Every column of ``X`` is linearly rescaled from its own observed
-    ``[min, max]`` span onto ``feature_range``::
+    Every column of ``X`` is transformed independently::
 
-        X_std = (X - X.min(axis=0)) / (X.max(axis=0) - X.min(axis=0))
-        X_scaled = X_std * (high - low) + low
+        X_scaled = (X - X.mean(axis=0)) / X.std(axis=0)
 
-    where ``(low, high) = feature_range``. The per-column minimum and
-    maximum are learned in :meth:`fit` and reused by :meth:`transform`, so
-    values outside the fitted span map outside ``feature_range`` rather than
-    being clipped.
+    The per-column mean and population standard deviation (dividing by
+    ``n_samples``) are learned in :meth:`fit` and reused by
+    :meth:`transform`. Centering is skipped when ``with_mean`` is false and
+    scaling is skipped when ``with_std`` is false; if both are false the
+    data passes through unchanged.
+
+    A feature with zero variance carries no information to scale, so its
+    standard deviation is treated as ``1``: the column is centered (when
+    ``with_mean`` is true) but never divided by zero.
 
     Parameters
     ----------
-    feature_range : tuple of (float, float), default=(0.0, 1.0)
-        Target ``(low, high)`` range for the transformed data.
+    with_mean : bool, default=True
+        If true, center the data by subtracting the per-feature mean.
+    with_std : bool, default=True
+        If true, scale the data to unit variance by dividing by the
+        per-feature standard deviation.
 
     Examples
     --------
     >>> import numpy as np
-    >>> from flxscalers import MinMaxScaler
+    >>> from flxscalers import StandardScaler
     >>> X = np.array([[0.0, 10.0], [5.0, 20.0], [10.0, 30.0]])
-    >>> MinMaxScaler().fit_transform(X)
-    array([[0. , 0. ],
-           [0.5, 0.5],
-           [1. , 1. ]])
+    >>> StandardScaler().fit_transform(X)
+    array([[-1.22474487, -1.22474487],
+           [ 0.        ,  0.        ],
+           [ 1.22474487,  1.22474487]])
     """
 
-    def __init__(self, feature_range: tuple[float, float] = (0.0, 1.0)) -> None:
-        self.feature_range = feature_range
+    def __init__(self, with_mean: bool = True, with_std: bool = True) -> None:
+        self.with_mean = with_mean
+        self.with_std = with_std
         # Composition, not inheritance: _impl is the compiled estimator.
-        self._impl = _core.MinMaxScaler(feature_range)
+        self._impl = _core.StandardScaler(with_mean, with_std)
 
-    def fit(self, X: npt.ArrayLike) -> MinMaxScaler:
-        """Compute the per-feature minimum and maximum used for scaling.
+    def fit(self, X: npt.ArrayLike) -> StandardScaler:
+        """Compute the per-feature mean and population standard deviation used for scaling.
 
         Parameters
         ----------
         X : array-like of shape (n_samples, n_features)
-            Data used to compute the per-feature range.
+            Data used to compute the per-feature mean and standard deviation.
 
         Returns
         -------
-        self : MinMaxScaler
+        self : StandardScaler
             The fitted scaler.
         """
         X = check_array(X)
@@ -62,7 +69,7 @@ class MinMaxScaler:
         return self
 
     def transform(self, X: npt.ArrayLike) -> npt.NDArray[np.float64]:
-        """Scale ``X`` onto ``feature_range`` using the fitted range.
+        """Center and scale ``X`` using the fitted mean and standard deviation.
 
         Parameters
         ----------
@@ -71,7 +78,7 @@ class MinMaxScaler:
         Returns
         -------
         ndarray of shape (n_samples, n_features)
-            The scaled data, as ``float64``.
+            The standardized data, as ``float64``.
         """
         X = check_array(X)
         if hasattr(self, "n_features_in_"):
@@ -82,19 +89,19 @@ class MinMaxScaler:
             raise NotFittedError(self) from e
 
     def fit_transform(self, X: npt.ArrayLike) -> npt.NDArray[np.float64]:
-        """Fit to ``X``, then scale it. Equivalent to ``fit(X).transform(X)``."""
+        """Fit to ``X``, then standardize it. Equivalent to ``fit(X).transform(X)``."""
         X = check_array(X)
         out = self._impl.fit_transform(X)
         self.n_features_in_ = X.shape[1]
         return out
 
     def inverse_transform(self, X: npt.ArrayLike) -> npt.NDArray[np.float64]:
-        """Map data from ``feature_range`` back to the original feature range.
+        """Undo standardization, mapping data back to the original feature space.
 
         Parameters
         ----------
         X : array-like of shape (n_samples, n_features)
-            Data in the scaled space.
+            Data in the standardized space.
 
         Returns
         -------
@@ -110,4 +117,4 @@ class MinMaxScaler:
             raise NotFittedError(self) from e
 
     def __repr__(self) -> str:
-        return f"{type(self).__name__}(feature_range={self.feature_range})"
+        return f"{type(self).__name__}(with_mean={self.with_mean}, with_std={self.with_std})"

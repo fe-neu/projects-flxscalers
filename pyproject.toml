@@ -4,7 +4,7 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "flxscalers"
-version = "0.1.0"
+version = "0.2.0"
 description = "A small package that offers an C++ based API for scaling data with scalers such as StandardScaler or MinMaxScaler."
 readme = "README.md"
 requires-python = ">=3.9"

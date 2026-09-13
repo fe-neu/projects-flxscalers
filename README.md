@@ -12,6 +12,10 @@ Python layer only validates input and wraps the result.
   `[min, max]` span onto a configurable `feature_range` (default `(0.0, 1.0)`).
   Values outside the fitted span map outside the range rather than being
   clipped.
+- **`StandardScaler`** — centers every feature to zero mean and scales it to
+  unit variance (population standard deviation). `with_mean` and `with_std`
+  toggle the two steps independently; zero-variance features are left
+  unscaled rather than dividing by zero.
 - **Familiar estimator API** — `fit`, `transform`, `fit_transform`, and
   `inverse_transform`, matching the scikit-learn method names and semantics.
 - **Compiled core** — the per-feature statistics and the scaling pass run in
@@ -21,9 +25,10 @@ Python layer only validates input and wraps the result.
 - **Typed** — ships `py.typed` and stubs, so `MinMaxScaler` is fully checkable
   under mypy/pyright.
 - **Clear errors** — calling `transform` before `fit` raises
-  `flxscalers.NotFittedError` with an actionable message.
-
-More scalers (e.g. `StandardScaler`) are planned.
+  `flxscalers.NotFittedError` with an actionable message; a 1-D array, a
+  non-finite value, or a feature-count mismatch between `fit` and
+  `transform`/`inverse_transform` raises a `ValueError` with a specific
+  message.
 
 ## Install
 
@@ -71,6 +76,24 @@ scaler.fit_transform(X)
 # array([[-1., -1.],
 #        [ 0.,  0.],
 #        [ 1.,  1.]])
+```
+
+`StandardScaler` centers each feature to zero mean and unit variance:
+
+```python
+from flxscalers import StandardScaler
+
+StandardScaler().fit_transform(X)
+# array([[-1.22474487, -1.22474487],
+#        [ 0.        ,  0.        ],
+#        [ 1.22474487,  1.22474487]])
+
+# Turn off either step; a constant feature is left unscaled rather than
+# producing NaN/inf.
+StandardScaler(with_std=False).fit_transform(X)
+# array([[-5., -10.],
+#        [ 0.,   0.],
+#        [ 5.,  10.]])
 ```
 
 Using a method that needs fitted state before calling `fit` raises:
@@ -153,8 +176,32 @@ pytest
    `bindings/register.hpp`, call it from `bindings/_core.cpp`, and add the
    `.cpp` to `pybind11_add_module(_core ...)`.
 3. **Python** — `python/flxscalers/scalers/_<name>.py` wrapping
-   `flxscalers._core.<Name>` by composition; re-export it from
-   `scalers/__init__.py` and the top-level `__init__.py`, and add the class to
+   `flxscalers._core.<Name>` by composition. Validate input with
+   `flxscalers.scalers._validation.check_array` in `fit`, `transform`,
+   `fit_transform`, and `inverse_transform`; have `fit`/`fit_transform` set
+   `self.n_features_in_ = X.shape[1]`, and have `transform`/
+   `inverse_transform` call `check_n_features(X, self.n_features_in_)` when
+   that attribute is already set. Re-export the class from
+   `scalers/__init__.py` and the top-level `__init__.py`, and add it to
    `_core.pyi`.
 4. **Tests** — `tests/cpp/scalers/test_<name>.cpp` (add it to
    `tests/cpp/CMakeLists.txt`) and `tests/python/scalers/test_<name>.py`.
+
+## Adding an exception
+
+1. **C++ core** — `src/flxscalers/exceptions/<name>.{hpp,cpp}`, a small
+   `std::exception` subclass; add the `.cpp` to the `flxscalers_core` source
+   list in `CMakeLists.txt`.
+2. **Binding** — `src/flxscalers/bindings/exceptions/<name>.cpp` defining
+   `register_<name>(pybind11::module_&)`, which registers the type with
+   `py::register_exception<CppName>(m, "PyName")` (this installs both the
+   Python exception type and the translator — no `py::class_` involved);
+   declare it in `bindings/register.hpp`, call it from `bindings/_core.cpp`,
+   and add the `.cpp` to `pybind11_add_module(_core ...)`.
+3. **Python** — `python/flxscalers/exceptions/_<name>.py` with a documented
+   subclass that builds a friendlier message (and any extra attributes, e.g.
+   the failing instance); re-export it from `exceptions/__init__.py` and the
+   top-level `__init__.py`.
+4. **Wiring** — wherever the C++ core raises the exception, catch the
+   translated `flxscalers._core.<PyName>` at the Python wrapper boundary and
+   re-raise the `flxscalers.exceptions.<name>` version from it.

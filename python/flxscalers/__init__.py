@@ -1,12 +1,19 @@
 """flxscalers: data scalers backed by a compiled C++ extension."""
 
 from flxscalers.exceptions import NotFittedError
-from flxscalers.scalers import MinMaxScaler
+from flxscalers.scalers import (
+    MinMaxScaler,
+    StandardScaler
+    )
 
 from importlib.metadata import PackageNotFoundError, version
 
 
-__all__ = ["MinMaxScaler", "NotFittedError"]
+__all__ = [
+    "MinMaxScaler",
+    "StandardScaler",
+    "NotFittedError",
+    ]
 
 try:
     __version__ = version("flxscalers")

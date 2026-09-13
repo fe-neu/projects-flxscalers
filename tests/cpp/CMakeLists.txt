@@ -14,6 +14,7 @@ FetchContent_MakeAvailable(Catch2)
 add_executable(flxscalers_cpp_tests
     core/test_matrix.cpp
     scalers/test_min_max_scaler.cpp
+    scalers/test_standard_scaler.cpp
 )
 target_link_libraries(flxscalers_cpp_tests
     PRIVATE
