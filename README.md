@@ -178,3 +178,22 @@ pytest
    `_core.pyi`.
 4. **Tests** — `tests/cpp/scalers/test_<name>.cpp` (add it to
    `tests/cpp/CMakeLists.txt`) and `tests/python/scalers/test_<name>.py`.
+
+## Adding an exception
+
+1. **C++ core** — `src/flxscalers/exceptions/<name>.{hpp,cpp}`, a small
+   `std::exception` subclass; add the `.cpp` to the `flxscalers_core` source
+   list in `CMakeLists.txt`.
+2. **Binding** — `src/flxscalers/bindings/exceptions/<name>.cpp` defining
+   `register_<name>(pybind11::module_&)`, which registers the type with
+   `py::register_exception<CppName>(m, "PyName")` (this installs both the
+   Python exception type and the translator — no `py::class_` involved);
+   declare it in `bindings/register.hpp`, call it from `bindings/_core.cpp`,
+   and add the `.cpp` to `pybind11_add_module(_core ...)`.
+3. **Python** — `python/flxscalers/exceptions/_<name>.py` with a documented
+   subclass that builds a friendlier message (and any extra attributes, e.g.
+   the failing instance); re-export it from `exceptions/__init__.py` and the
+   top-level `__init__.py`.
+4. **Wiring** — wherever the C++ core raises the exception, catch the
+   translated `flxscalers._core.<PyName>` at the Python wrapper boundary and
+   re-raise the `flxscalers.exceptions.<name>` version from it.

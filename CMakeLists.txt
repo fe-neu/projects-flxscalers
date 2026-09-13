@@ -32,6 +32,7 @@ if(FLXSCALERS_BUILD_PYTHON)
         src/flxscalers/bindings/conversions.cpp
         src/flxscalers/bindings/scalers/min_max_scaler.cpp
         src/flxscalers/bindings/scalers/standard_scaler.cpp
+        src/flxscalers/bindings/exceptions/not_fitted_error.cpp
     )
     target_link_libraries(_core PRIVATE flxscalers_core)
 

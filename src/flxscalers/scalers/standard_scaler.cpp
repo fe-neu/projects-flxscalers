@@ -3,6 +3,8 @@
 
 #include "standard_scaler.hpp"
 
+#include "flxscalers/exceptions/not_fitted_error.hpp"
+
 StandardScaler::StandardScaler(bool with_mean, bool with_std)
     : with_mean(with_mean), with_std(with_std), is_fitted(false) {}
 
@@ -54,7 +56,7 @@ double StandardScaler::compute_std_for_col(const Matrix& X, std::size_t n_col, d
 Matrix StandardScaler::transform(const Matrix& X) const {
     if (!with_mean && !with_std) { return X; } // Nothing to do
 
-    if (!is_fitted) throw std::logic_error("call fit() first");
+    if (!is_fitted) throw NotFittedError("call fit() first");
 
     Matrix result = Matrix(X.rows, X.cols);
 
@@ -88,7 +90,7 @@ Matrix StandardScaler::fit_transform(const Matrix& X) {
 Matrix StandardScaler::inverse_transform(const Matrix& X) const {
     if (!with_mean && !with_std) { return X; } // Nothing to do
 
-    if (!is_fitted) throw std::logic_error("call fit() first");
+    if (!is_fitted) throw NotFittedError("call fit() first");
 
     Matrix result = Matrix(X.rows, X.cols);
 

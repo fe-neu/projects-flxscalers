@@ -72,7 +72,7 @@ class MinMaxScaler:
         """
         try:
             return self._impl.transform(self._validate(X))
-        except RuntimeError as e:
+        except _core.NotFittedError as e:
             raise NotFittedError(self) from e
 
     def fit_transform(self, X: npt.ArrayLike) -> npt.NDArray[np.float64]:
@@ -94,7 +94,7 @@ class MinMaxScaler:
         """
         try:
             return self._impl.inverse_transform(self._validate(X))
-        except RuntimeError as e:
+        except _core.NotFittedError as e:
             raise NotFittedError(self) from e
 
     def __repr__(self) -> str:

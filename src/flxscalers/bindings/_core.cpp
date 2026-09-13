@@ -7,6 +7,7 @@
 PYBIND11_MODULE(_core, m) {
     m.doc() = "Compiled core for flxscalers. Internal; use the flxscalers package.";
 
+    register_not_fitted_error(m);
     register_min_max_scaler(m);
     register_standard_scaler(m);
 }

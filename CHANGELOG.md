@@ -15,6 +15,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   features are left unscaled instead of dividing by zero. Provides `fit`,
   `transform`, `fit_transform`, and `inverse_transform`.
 
+### Changed
+
+- The C++ core now throws a dedicated `NotFittedError` type, registered with
+  pybind11 as `flxscalers._core.NotFittedError` via a proper exception
+  translator, instead of a generic `std::runtime_error` that crossed into
+  Python as a plain `RuntimeError`. The public `flxscalers.NotFittedError`
+  and its message are unchanged.
+
 ## [0.1.0] - 2026-09-05
 
 ### Added
